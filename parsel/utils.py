@@ -79,9 +79,11 @@ def extract_regex(
         strings = regex.findall(text)
 
     strings = flatten(strings)
-    if not replace_entities:
-        return strings
-    return [w3lib_replace_entities(s, keep=["lt", "amp"]) for s in strings]
+    return (
+        [w3lib_replace_entities(s, keep=["lt", "amp"]) for s in strings]
+        if replace_entities
+        else strings
+    )
 
 
 def shorten(text: str, width: int, suffix: str = "...") -> str:
