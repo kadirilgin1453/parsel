@@ -38,7 +38,7 @@ class XPathExpr(OriginalXPathExpr):
             if path == "*":
                 path = "text()"
             elif path.endswith("::*/*"):
-                path = path[:-3] + "text()"
+                path = f"{path[:-3]}text()"
             else:
                 path += "/text()"
 
@@ -101,20 +101,20 @@ class TranslatorMixin:
         """
         if isinstance(pseudo_element, FunctionalPseudoElement):
             method_name = f"xpath_{pseudo_element.name.replace('-', '_')}_functional_pseudo_element"
-            method = getattr(self, method_name, None)
-            if not method:
+            if method := getattr(self, method_name, None):
+                xpath = method(xpath, pseudo_element)
+            else:
                 raise ExpressionError(
                     f"The functional pseudo-element ::{pseudo_element.name}() is unknown"
                 )
-            xpath = method(xpath, pseudo_element)
         else:
             method_name = f"xpath_{pseudo_element.replace('-', '_')}_simple_pseudo_element"
-            method = getattr(self, method_name, None)
-            if not method:
+            if method := getattr(self, method_name, None):
+                xpath = method(xpath)
+            else:
                 raise ExpressionError(
                     f"The pseudo-element ::{pseudo_element} is unknown"
                 )
-            xpath = method(xpath)
         return xpath
 
     def xpath_attr_functional_pseudo_element(

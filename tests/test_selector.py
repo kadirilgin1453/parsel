@@ -998,21 +998,15 @@ class SelectorTestCase(unittest.TestCase):
         # only when smart_strings are on
         x = self.sscls(text=body)
         li_text = x.xpath("//li/text()")
-        self.assertFalse(any([hasattr(e.root, "getparent") for e in li_text]))
+        self.assertFalse(any(hasattr(e.root, "getparent") for e in li_text))
         div_class = x.xpath("//div/@class")
-        self.assertFalse(
-            any([hasattr(e.root, "getparent") for e in div_class])
-        )
+        self.assertFalse(any(hasattr(e.root, "getparent") for e in div_class))
 
         smart_x = SmartStringsSelector(text=body)
         smart_li_text = smart_x.xpath("//li/text()")
-        self.assertTrue(
-            all([hasattr(e.root, "getparent") for e in smart_li_text])
-        )
+        self.assertTrue(all(hasattr(e.root, "getparent") for e in smart_li_text))
         smart_div_class = smart_x.xpath("//div/@class")
-        self.assertTrue(
-            all([hasattr(e.root, "getparent") for e in smart_div_class])
-        )
+        self.assertTrue(all(hasattr(e.root, "getparent") for e in smart_div_class))
 
     def test_xml_entity_expansion(self) -> None:
         malicious_xml = (
@@ -1030,14 +1024,18 @@ class SelectorTestCase(unittest.TestCase):
         self.assertEqual("http://example.com", sel.root.base)
 
     def test_extending_selector(self) -> None:
+
         class MySelectorList(SelectorList["MySelector"]):
             pass
+
+
 
         class MySelector(Selector):
             selectorlist_cls = MySelectorList
 
             def extra_method(self) -> str:
-                return "extra" + cast(str, self.get())
+                return f"extra{cast(str, self.get())}"
+
 
         sel = MySelector(text="<html><div>foo</div></html>")
         self.assertIsInstance(sel.xpath("//div"), MySelectorList)

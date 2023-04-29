@@ -101,11 +101,11 @@ def create_root_node(
     encoding: str = "utf8",
 ) -> etree._Element:
     """Create root node for text using given parser class."""
-    if not text:
-        body = body.replace(b"\x00", b"").strip()
-    else:
-        body = text.strip().replace("\x00", "").encode(encoding) or b"<html/>"
-
+    body = (
+        text.strip().replace("\x00", "").encode(encoding) or b"<html/>"
+        if text
+        else body.replace(b"\x00", b"").strip()
+    )
     if huge_tree and LXML_SUPPORTS_HUGE_TREE:
         parser = parser_cls(recover=True, encoding=encoding, huge_tree=True)
         root = etree.fromstring(body, parser=parser, base_url=base_url)
@@ -522,7 +522,7 @@ class Selector:
 
         self.namespaces = dict(self._default_namespaces)
         if namespaces is not None:
-            self.namespaces.update(namespaces)
+            self.namespaces |= namespaces
 
         self._expr = _expr
         self._huge_tree = huge_tree
@@ -638,7 +638,7 @@ class Selector:
 
         nsp = dict(self.namespaces)
         if namespaces is not None:
-            nsp.update(namespaces)
+            nsp |= namespaces
         try:
             result = xpathev(
                 query,

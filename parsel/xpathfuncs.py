@@ -56,9 +56,6 @@ def has_class(context: Any, *classes: str) -> bool:
     node_cls = context.context_node.get("class")
     if node_cls is None:
         return False
-    node_cls = " " + node_cls + " "
+    node_cls = f" {node_cls} "
     node_cls = replace_html5_whitespaces(" ", node_cls)
-    for cls in classes:
-        if " " + cls + " " not in node_cls:
-            return False
-    return True
+    return all(f" {cls} " in node_cls for cls in classes)
